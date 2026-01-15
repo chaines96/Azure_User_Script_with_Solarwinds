@@ -15,7 +15,6 @@ param (
 
 if (-not $Password) {$Password = "welcome"}
 if (-not $ReferenceUser) {$ReferenceUser = "no-reply@($Domain)"}
-$UPN_A = ""
 
 #Prepare the log file
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -35,7 +34,7 @@ if (-not $UPN) {$UPN = "$($FirstName[0])$($LastName)@($DomainName)"} #Defining U
 		write-host "Creating a user with the following values:"
 		write-host "[1] First Name: $($FirstName)"
 		write-host "[2] Last Name: $($LastName)"
-		write-host "[3] A request was detected for email $($UPN_A) and will in fact create $($UPN)"
+		write-host "[3] A request was detected for email $($UPN) and will in fact create $($UPN)"
 		write-host "[4] Job Title: $($TItle)"
 		write-host "[5] City: $($City)"
 		write-host "[6] Department: $($Dept)"
@@ -101,4 +100,5 @@ catch {
 
 write-host "User creaction process has finished with password $($Password)"
 "User creation complete" | Out-File -Append -FilePath $logFile
+
 read-host
