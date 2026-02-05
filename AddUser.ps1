@@ -31,9 +31,9 @@ if ($Incident -ne $null) {
 	$raw_request = Invoke-RestMethod -Uri "https://api.samanage.com/incidents/$($Incident)" -Headers $header_params
 	$cust = $raw_request.custom_fields_values
 
-	#Extracting values
-	# Path to your text file
-	$filePath = "numbers.txt"
+	#This part of the loop expects a text file with seven comma separated integers. These will correspond to the values in your JSON input.
+	#Some experimentation may be required with your specific organization to get them right.
+	$filePath = "field_indices.txt"
 
 	# Read file content
 	$raw = Get-Content -Path $filePath
@@ -45,20 +45,23 @@ if ($Incident -ne $null) {
 	if (-not ($tokens | ForEach-Object { $_ -match '^-?\d+$' } | Where-Object { $_ -eq $false } | Measure-Object).Count -eq 0) {
 		"No field index file available. Will not attempt to get values through API." | Out-File -Append -FilePath $logFile
 	}
-
-	# Convert to integers
-	$numbers = $tokens | ForEach-Object { [int]$_ }
-
-	# Validate count = 6
-	if ($numbers.Count -ne 6) {
-		write-host "Expected exactly 6 integers, but found $($numbers.Count)."
-		"No field index file available. Will not attempt to get values through API." | Out-File -Append -FilePath $logFile
-	}
 	else {
+			$numbers = $tokens | ForEach-Object { [int]$_ } #Convert strings ti ints
+
+			#Separating these into separate, named variables for visual clarity.
+			$EMPLOYEE_NAME_INDEX = $numbers[0]
+			$JOBTITLE_INDEX = $numbers[1]
+			$CITY_INDEX = $numbers[2]
+			$DEPT_INDEX = $numbers[3]
+			$COUNTRY = $numbers[4]
+			$PHONE_IND = $numbers[5]
+			$EMAIL_ADDR_IND = $numbers[6]
+
 			$cust = $raw_request.custom_fields_values
 			$Employee_Name_data = $cust[$EMPLOYEE_NAME_INDEX]
 			$Job_Title_data = $cust[$JOBTITLE_INDEX]
 			$City_data = $cust[$CITY_INDEX]
+			$Country_data = $cust[$COUNTRY_INDEX]
 			$Dept_data = $cust[$DEPT_INDEX]
 			$Phone_data = $cust[$PHONE_IND]
 			$Preferred_Email_data = $cust[$EMAIL_ADDR_IND]
@@ -73,6 +76,7 @@ if ($Incident -ne $null) {
 			$UPN_A = $Preferred_Email_data.value 
 			$City = $City_data.value 
 			$Dept = $Dept_data.value
+			$Country = $Country_data.value
 	}
 
 }
